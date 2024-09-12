@@ -38,13 +38,14 @@ async function handleRequest(request) {
       // 发起对目标 URL 的请求
       const response = await fetch(modifiedRequest);
       let body = response.body;
+      const contentType = response.headers.get('content-type');
 
       // 处理重定向
       if ([301, 302, 303, 307, 308].includes(response.status)) {
           body = response.body;
           // 创建新的 Response 对象以修改 Location 头部
           return handleRedirect(response, body);
-      } else if (response.headers.get("Content-Type")?.includes("text/html")) {
+      } else if (contentType && ( /^(application\/x-javascript|text\/)/i.test(contentType))) {
           body = await handleHtmlContent(response, url.protocol, url.host, actualUrlStr);
       }
 
